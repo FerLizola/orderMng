@@ -1,6 +1,7 @@
 package com.ferlizola.controllers;
 
 import java.net.URI;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
@@ -65,9 +66,9 @@ public class OrderResource {
 	@Autowired
 	private EmailService emailService ;
 
-	@GetMapping(path = "/order")
-	public List<Order> showOrders() {
-		return orderRepository.findAll();
+	@GetMapping(path = "/orders/{userid}")
+	public List<Order> showOrders(@PathVariable int userid) {
+		return orderRepository.findAllByPersonPersonId(userid);
 	}
 
 	@RequestMapping(method = RequestMethod.GET, path = "/order/{id}")
@@ -83,7 +84,7 @@ public class OrderResource {
 
 		EntityModel<Order> model = EntityModel.of(order.get());
 
-		WebMvcLinkBuilder linkToOrders = linkTo(methodOn(this.getClass()).showOrders());
+		WebMvcLinkBuilder linkToOrders = linkTo(methodOn(this.getClass()).showOrders(order.get().getPerson().getPersonId()));
 
 		model.add(linkToOrders.withRel("all-orders"));
 
@@ -105,7 +106,7 @@ public class OrderResource {
 
 		CollectionModel<OrderItem> model = CollectionModel.of(items);
 
-		WebMvcLinkBuilder linkToOrders = linkTo(methodOn(this.getClass()).showOrders());
+		WebMvcLinkBuilder linkToOrders = linkTo(methodOn(this.getClass()).showOrders(order.get().getPerson().getPersonId()));
 
 		model.add(linkToOrders.withRel("all-orders"));
 		

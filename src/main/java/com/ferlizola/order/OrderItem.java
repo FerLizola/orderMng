@@ -8,6 +8,7 @@ import javax.persistence.Id;
 import javax.persistence.ManyToOne;
 import javax.validation.constraints.Min;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.ferlizola.product.Product;
 
 //import com.ferlizola.dao.Product;
@@ -26,6 +27,7 @@ public class OrderItem {
 	private int quantity;
 	
 	@ManyToOne(fetch=FetchType.LAZY)
+	@JsonIgnore
 	private Order order;
 
 	public OrderItem() {}
