@@ -1,6 +1,7 @@
 package com.ferlizola.jwtconfig;
 
 import java.util.ArrayList;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.User;
@@ -22,9 +23,10 @@ public class JwtUserDetailsService implements UserDetailsService {
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
 		try {
-			Person user = person.findByEmail(username);
-
-			return new User(username, user.getPwd(), new ArrayList<>());
+			Optional<Person> user = person.findByEmail(username);
+			if(user.isPresent())
+				return new User(username, user.get().getPwd(), new ArrayList<>());
+			throw new UsernameNotFoundException("User not found with username: " + username);
 		} catch (Exception ex) {
 			throw new UsernameNotFoundException("User not found with username: " + username);
 		}
