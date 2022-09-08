@@ -118,6 +118,11 @@ public class OrderResource {
 		if (order.isPresent()) {
 			order.get().setOrderStatus(OrderStatus.CANCELED.toString());
 			orderRepository.save(order.get());
+			EmailDetails details = new EmailDetails(order.get().getPerson().getEmail(),
+	        		"Order #" + order.get().getOrderId() + " was marked as canceled on " + new Date() + ".",
+	        		"Order has been canceled",
+	        		"");
+	        String result = emailService.sendSimpleMail(details);
 			return;
 
 		}
@@ -126,17 +131,26 @@ public class OrderResource {
 	}
 	
 	@PutMapping(path = "/order/{id}")
-	public void deleteOrder(@RequestBody Order order) {
+	public void modifyOrder(@PathVariable String id) {
 		
-		Optional<Order> orderExt = orderRepository.findById(order.getOrderId());
+		Optional<Order> orderExt = orderRepository.findById(Integer.parseInt(id));
 
 		if (orderExt.isPresent()) {
-			//orderRepository.save(order.orderExt());
+			orderExt.get().setOrderStatus(OrderStatus.COMPLETED.toString());
+			orderRepository.save(orderExt.get());
+			EmailDetails details = new EmailDetails(orderExt.get().getPerson().getEmail(),
+	        		"Order #" + orderExt.get().getOrderId() + " was marked as completed on " + new Date() + ".",
+	        		"Order has been completed",
+	        		"");
+	        String result = emailService.sendSimpleMail(details);
+	        //String result = "NOT ENABLED EMAIL SENDER";
+	        
+	        logger.info("Order completed, " + result);
 			return;
 
 		}
 		throw new OrderNotFoundException(
-				"The order with the ID- " + order.getOrderId() + " was not found, please verify the information!");
+				"The order with the ID- " + id + " was not found, please verify the information!");
 	}
 
 	@PostMapping("/order")
@@ -176,7 +190,7 @@ public class OrderResource {
             logger.info("Item :: " + itemSaved);
         }
         EmailDetails details = new EmailDetails(person.get().getEmail(),
-        		"Order #" + order.getOrderId() + " was successfully creadted on " + savedOrder.getOrderDate() + ".",
+        		"Order #" + order.getOrderId() + " was successfully created on " + savedOrder.getOrderDate() + ".",
         		"Order created successfully",
         		"");
         String result = emailService.sendSimpleMail(details);
